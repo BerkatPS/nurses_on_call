@@ -12,7 +12,7 @@ return new class extends Migration
     public function up()
     {
         Schema::create('emergency_calls', function (Blueprint $table) {
-            $table->id(); // Incremental ID
+            $table->id();
             $table->unsignedBigInteger('user_id');
             $table->string('location');
             $table->text('description');

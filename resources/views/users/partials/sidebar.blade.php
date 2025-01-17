@@ -24,7 +24,8 @@
                 ['icon' => 'fa-calendar-alt', 'label' => 'Jadwal Layanan', 'route' => 'user.bookings', 'color' => 'text-blue-300'],
                 ['icon' => 'fa-ambulance', 'label' => 'Panggilan Darurat', 'route' => 'user.emergency', 'color' => 'text-blue-300'],
                 ['icon' => 'fa-user-md', 'label' => 'Perawat', 'route' => 'user.nurses', 'color' => 'text-blue-300'],
-                ['icon' => 'fa-user', 'label' => 'Pengaturan', 'route' => 'user.profile', 'color' => 'text-blue-300']
+                ['icon' => 'fa-star', 'label' => 'Reviews', 'route' => 'user.reviews', 'color' => 'text-blue-300'],
+                ['icon' => 'fa-user', 'label' => 'Pengaturan', 'route' => 'user.profile', 'color' => 'text-blue-300'],
             ];
         @endphp
 

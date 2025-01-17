@@ -73,7 +73,7 @@
             <div class="bg-white/80 backdrop-blur-lg rounded-3xl shadow-2xl p-8 border border-white/20 transform hover:scale-[1.02] transition-all duration-300">
                 <div class="flex justify-between items-center mb-6">
                     <h2 class="text-3xl font-bold text-blue-600">Jadwal Layanan</h2>
-                    <a href="#" class="text-blue-500 hover:text-blue-700 transition">Lihat Semua</a>
+                    <a href="/user/booking" class="text-blue-500 hover:text-blue-700 transition">Lihat Semua</a>
                 </div>
 
                 <div class="grid md:grid-cols-2 gap-6">
@@ -115,7 +115,7 @@
             <div class="bg-white/80 backdrop-blur-lg rounded-3xl shadow-2xl p-8 border border-white/20 transform hover:scale-[1.02] transition-all duration-300">
                 <div class="flex justify-between items-center mb-6">
                     <h2 class="text-3xl font-bold text-blue-600">Riwayat Panggilan Darurat</h2>
-                    <a href="#" class="text-blue-500 hover:text-blue-700 transition">Lihat Semua</a>
+                    <a href="/user/emergency-calls" class="text-blue-500 hover:text-blue-700 transition">Lihat Semua</a>
                 </div>
                 <div class="grid md:grid-cols-2 gap-6">
                     @foreach($dashboardData->emergencyCalls as $call)

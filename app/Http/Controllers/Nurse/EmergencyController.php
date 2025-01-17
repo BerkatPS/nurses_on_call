@@ -69,6 +69,7 @@ class EmergencyController extends Controller
         return view('nurses.emergency.index', compact('emergencyCalls', 'emergencySummary'));
     }
 
+
     protected function getEmergencySummary($emergencyCalls)
     {
         $emergencyCallsCollection = collect($emergencyCalls);
@@ -87,29 +88,34 @@ class EmergencyController extends Controller
     // Metode untuk menanggapi panggilan darurat
     public function respondToEmergencyCall($callId)
     {
-        $nurse = Auth::user()->nurse;
-
         try {
-            $emergencyCall = EmergencyCall::findOrFail($callId);
+            $nurse = auth()->user()->nurse;
 
-            // Validasi status panggilan
-            if ($emergencyCall->status !== 'pending') {
+            if (!$nurse) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Panggilan darurat sudah ditanggapi'
-                ], 400);
+                    'message' => 'Anda tidak memiliki izin'
+                ], 403);
             }
 
-            // Update status dan assign nurse
-            $emergencyCall->status = 'responded';
-            $emergencyCall->assigned_nurse_id = $nurse->id;
-            $emergencyCall->save();
+            $emergencyCall = EmergencyCall::findOrFail($callId);
 
+        if ($emergencyCall->status !== 'pending') {
             return response()->json([
-                'success' => true,
-                'message' => 'Berhasil menanggapi panggilan darurat'
-            ]);
-        } catch (\Exception $e) {
+                'success' => false,
+                'message' => 'Panggilan darurat sudah ditanggapi'
+            ], 400);
+        }
+
+        $emergencyCall->status = 'responded';
+        $emergencyCall->assigned_nurse_id = $nurse->id;
+        $emergencyCall->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Berhasil menanggapi panggilan darurat'
+        ]);
+    } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Gagal menanggapi panggilan darurat: ' . $e->getMessage()
@@ -117,15 +123,20 @@ class EmergencyController extends Controller
         }
     }
 
-    // Metode untuk menyelesaikan panggilan darurat
     public function completeEmergencyCall(Request $request, $callId)
     {
-        $nurse = Auth::user()->nurse;
-
         try {
+            $nurse = auth()->user()->nurse;
+
+            if (!$nurse) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Anda tidak memiliki izin'
+                ], 403);
+            }
+
             $emergencyCall = EmergencyCall::findOrFail($callId);
 
-            // Validasi status panggilan
             if ($emergencyCall->status !== 'responded') {
                 return response()->json([
                     'success' => false,
@@ -133,10 +144,6 @@ class EmergencyController extends Controller
                 ], 400);
             }
 
-            // Validasi bahwa nurse yang menyelesaikan adalah nurse yang menanggapi
-
-
-            // Update status dan tambahkan catatan
             $emergencyCall->status = 'resolved';
             $emergencyCall->description = $request->input('notes', 'Panggilan darurat diselesaikan');
             $emergencyCall->save();

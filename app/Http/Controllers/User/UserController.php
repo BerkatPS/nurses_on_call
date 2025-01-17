@@ -51,7 +51,6 @@ class UserController extends Controller
             });
 
         // Layanan Mendatang
-        // Layanan Mendatang
         $upcomingServices = Booking::where('user_id', $user->id)
             ->where('status', 'confirmed')
             ->with('nurse', 'service') // Pastikan relasi ini ada

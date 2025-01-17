@@ -44,6 +44,11 @@ class Nurse extends Model
         return $query->where('availability_status', 'available');
     }
 
+    public function reviews()
+    {
+        return $this->hasManyThrough(Review::class, Booking::class);
+    }
+
     public function scopeBySpecialization($query, $specialization)
     {
         return $query->where('specializations', 'like', "%{$specialization}%");

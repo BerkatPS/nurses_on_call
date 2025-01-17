@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Booking;
 use App\Models\Nurse;
 use App\Models\Service;
+use App\Models\Review;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
@@ -32,7 +33,7 @@ class UserBookingController extends Controller
 
     protected function getBookings($userId, $statusFilter)
     {
-        $query = Booking::where('user_id', $userId);
+        $query = Booking::where('user_id', $userId)->orderBy('created_at', 'desc');
 
         // Filter berdasarkan status
         if ($statusFilter !== 'all') {
@@ -96,9 +97,6 @@ class UserBookingController extends Controller
                 'emergency_level' => $request->emergency_level ?? 1
             ]);
 
-            // Tidak mengubah status ketersediaan perawat
-            // $nurse->update(['availability_status' => 'busy']); // Hapus baris ini
-
             return response()->json([
                 'success' => true,
                 'message' => 'Booking berhasil dibuat',
@@ -116,7 +114,6 @@ class UserBookingController extends Controller
 
     protected function findAvailableNurse($service)
     {
-        // Cari perawat dengan spesialisasi yang sesuai dan tersedia
         return Nurse::where('availability_status', 'available')
             ->whereHas('user', function($query) use ($service) {
                 $query->where('specializations', 'like', "%{$service->type}%");
@@ -126,7 +123,6 @@ class UserBookingController extends Controller
 
     protected function calculateEndTime($service, $startTime)
     {
-        // Tentukan durasi berdasarkan tipe layanan
         $durationMap = [
             'homecare' => 2,
             'emergency' => 1,
@@ -140,11 +136,9 @@ class UserBookingController extends Controller
 
     protected function calculateTotalAmount($service, $startTime, $endTime)
     {
-        // Hitung total biaya berdasarkan durasi
         $hours = $startTime->diffInHours($endTime);
         $basePrice = $service->base_price;
 
-        // Tambahan biaya berdasarkan durasi
         $totalAmount = $basePrice * (1 + ($hours * 0.2));
 
         return round($totalAmount, 2);
@@ -152,22 +146,33 @@ class UserBookingController extends Controller
 
     public function show($bookingId)
     {
-        // Ambil detail booking dengan relasi
-        $booking = Booking::with([
-            'service',
-            'nurse' => function($query) {
-                $query->with('user');
-            }
-        ])->findOrFail($bookingId);
+        $user = Auth::user();
 
-        return response()->json($booking);
+        $booking = Booking::where('id', $bookingId)
+            ->where('user_id', $user->id)
+            ->with(['service', 'nurse.user'])
+            ->first();
+
+        if (!$booking) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Booking tidak ditemukan atau Anda tidak memiliki akses'
+            ], 403);
+        }
+
+        $booking->formatted_start_time = Carbon::parse($booking->start_time)->format('d M Y H:i');
+        $booking->formatted_end_time = Carbon::parse($booking->end_time)->format('d M Y H:i');
+
+        return response()->json([
+            'success' => true,
+            'data' => $booking
+        ]);
     }
 
     public function cancel($bookingId)
     {
         $booking = Booking::findOrFail($bookingId);
 
-        // Pastikan user yang membatalkan adalah pemilik booking
         if ($booking->user_id !== Auth::id()) {
             return response()->json([
                 'success' => false,
@@ -175,7 +180,6 @@ class UserBookingController extends Controller
             ], 403);
         }
 
-        // Pastikan booking bisa dibatalkan
         if (!in_array($booking->status, ['pending', 'confirmed'])) {
             return response()->json([
                 'success' => false,
@@ -184,7 +188,6 @@ class UserBookingController extends Controller
         }
 
         try {
-            // Ubah status booking
             $booking->status = 'cancelled';
             $booking->save();
 

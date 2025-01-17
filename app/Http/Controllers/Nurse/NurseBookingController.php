@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Nurse;
 
 use App\Http\Controllers\Controller;
 use App\Models\Nurse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Booking;
 use App\Models\EmergencyCall;
@@ -23,16 +24,14 @@ class NurseBookingController extends Controller
 
         // Ambil data booking aktif
         $activeBookings = $this->getActiveBookings($nurse);
-
-        // Layanan Mendatang
         $upcomingServices = $this->getUpcomingServices($nurse);
-
-        // Panggilan Darurat
+        $completedBookings = $this->getCompletedBookings($nurse);
         $emergencyCalls = $this->getEmergencyCalls($nurse);
 
         return view('nurses.bookings.index', compact(
             'activeBookings',
             'upcomingServices',
+            'completedBookings',
             'emergencyCalls'
         ));
     }
@@ -40,7 +39,7 @@ class NurseBookingController extends Controller
     protected function getActiveBookings(Nurse $nurse)
     {
         return Booking::where('nurse_id', $nurse->id)
-            ->whereIn('status', ['pending', 'confirmed'])
+            ->whereIn('status', ['pending'])
             ->with(['user', 'service'])
             ->get()
             ->map(function($booking) {
@@ -77,15 +76,201 @@ class NurseBookingController extends Controller
                     'location' => $booking->location,
                     'notes' => $booking->notes,
                     'time' => Carbon::parse($booking->start_time)->format('H:i'),
-                    'status' => 'Scheduled',
+                    'status' => 'confirmed',
                     'description' => $booking->notes,
                 ];
             });
     }
 
-    protected function getEmergencyCalls(Nurse $nurse)
+    protected function getCompletedBookings(Nurse $nurse)
     {
+        return Booking::where('nurse_id', $nurse->id)
+            ->where('status', 'completed')
+            ->with(['user', 'service'])
+            ->get()
+            ->map(function($booking) {
+                return (object)[
+                    'id' => $booking->id,
+                    'user' => (object)[
+                        'name' => $booking->user->name,
+                        'phone' => $booking->user->phone
+                    ],
+                    'service' => (object)[
+                        'name' => $booking->service->name
+                    ],
+                    'total_amount' => $booking->total_amount,
+                    'notes' => $booking->notes,
+                    'startTime' => $booking->start_time,
+                    'status' => $booking->status,
+                    'location' => $booking->location,
+                    'file_path' => $booking->file_path // Menyertakan file_path
+                ];
+            });
+    }
+
+    public function updateBookingStatus(Request $request, $bookingId)
+    {
+        $nurse = Auth::user()->nurse;
+        $booking = Booking::findOrFail($bookingId);
+
+        // Validasi kepemilikan booking
+        if ($booking->nurse_id !== $nurse->id) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Anda tidak memiliki izin untuk mengubah status booking ini.'
+            ], 403);
+        }
+
+        $validatedData = $request->validate([
+            'status' => 'required|in:in_progress,completed,cancelled'
+        ]);
+
+        try {
+            // Update status booking
+            $booking->update([
+                'status' => $validatedData['status']
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Status booking berhasil diperbarui.',
+                'booking' => $booking
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal memperbarui status booking.'
+            ], 500);
+        }
+    }
+
+    public function cancelBooking($bookingId)
+    {
+        $nurse = Auth::user()->nurse;
+        $booking = Booking::findOrFail($bookingId);
+
+        // Validasi kepemilikan booking
+        if ($booking->nurse_id !== $nurse->id) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Anda tidak memiliki izin untuk membatalkan booking ini.'
+            ], 403);
+        }
+
+        try {
+            // Update status booking menjadi 'cancelled'
+            $booking->update(['status' => 'cancelled']);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Booking berhasil dibatalkan.'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal membatalkan booking: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function confirmBooking($bookingId)
+    {
+        $nurse = Auth::user()->nurse;
+        $booking = Booking::findOrFail($bookingId);
+
+        // Validasi kepemilikan booking
+        if ($booking->nurse_id !== $nurse->id) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Anda tidak memiliki izin untuk mengkonfirmasi booking ini.'
+            ], 403);
+        }
+
+        try {
+            // Update status booking menjadi 'confirmed'
+            $booking->update(['status' => 'confirmed']);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Booking berhasil dikonfirmasi.'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal mengkonfirmasi booking: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function completeBooking($bookingId)
+    {
+        $nurse = Auth::user()->nurse;
+        $booking = Booking::findOrFail($bookingId);
+
+        // Validasi kepemilikan booking
+        if ($booking->nurse_id !== $nurse->id) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Anda tidak memiliki izin untuk menyelesaikan booking ini.'
+            ], 403);
+        }
+
+        try {
+            // Update status booking menjadi 'completed'
+            $booking->update(['status' => 'completed']);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Booking berhasil diselesaikan.'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal menyelesaikan booking: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function uploadProof(Request $request, $bookingId)
+    {
+        $request->validate([
+            'file' => 'required|file|mimes:pdf,jpg,jpeg,png|max:2048', // Validasi file
+        ]);
+
+        $booking = Booking::findOrFail($bookingId);
+
+        // Validasi kepemilikan booking
+        if ($booking->nurse_id !== Auth::user()->nurse->id) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Anda tidak memiliki izin untuk mengupload bukti ini.'
+            ], 403);
+        }
+
+        try {
+            // Upload file
+            $filePath = $request->file('file')->store('uploads', 'public'); // Simpan file di storage/app/public/uploads
+
+            // Update booking dengan file path
+            $booking->update(['file_path' => $filePath]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Bukti berhasil diupload.',
+                'file_path' => $filePath
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal mengupload bukti: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    protected function getEmergencyCalls(Nurse $nurse) {
         return EmergencyCall::where('assigned_nurse_id', $nurse->id)
+            ->orderBy('created_at', 'desc')
+            ->limit(6)
             ->get()
             ->map(function($call) {
                 return (object)[

@@ -61,6 +61,14 @@
                         'description' => 'Pantau panggilan darurat'
                     ],
                     [
+                        'icon' => 'fa-star',
+                        'label' => 'Reviews',
+                        'route' => 'nurse.reviews',
+                        'color' => 'text-blue-300',
+                        'description' => 'Pantau ulasan'
+                    ],
+
+                    [
                         'icon' => 'fa-user',
                         'label' => 'Profil',
                         'route' => 'nurse.profile',

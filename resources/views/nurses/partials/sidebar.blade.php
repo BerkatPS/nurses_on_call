@@ -23,6 +23,7 @@
                     ['icon' => 'fa-home', 'label' => 'Dashboard', 'route' => 'nurse.index', 'color' => 'text-blue-300'],
                     ['icon' => 'fa-calendar-alt', 'label' => 'Jadwal Layanan', 'route' => 'nurse.bookings', 'color' => 'text-blue-300'],
                     ['icon' => 'fa-ambulance', 'label' => 'Panggilan Darurat', 'route' => 'nurse.emergency', 'color' => 'text-blue-300'],
+                    ['icon' => 'fa-star', 'label' => 'Reviews', 'route' => 'nurse.reviews', 'color' => 'text-blue-300'],
                     ['icon' => 'fa-user', 'label' => 'Pengaturan', 'route' => 'nurse.profile', 'color' => 'text-blue-300']
                 ];
         @endphp

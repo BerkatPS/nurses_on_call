@@ -57,7 +57,6 @@
                 </div>
 
                 <!-- Tugas Aktif -->
-                <!-- Tugas Aktif -->
                 <div class="md:col-span-2 bg-white/80 backdrop-blur-lg rounded-3xl shadow-2xl p-8 border border-white/20 transform hover:scale-[1.02] transition-all duration-300">
                     <div class="flex justify-between items-center mb-6">
                         <h2 class="text-3xl font-bold text-blue-600">Tugas Aktif</h2>
@@ -145,15 +144,12 @@
                 <div class="modal-dialog modal-lg">
                     <div class="modal-content">
                         <div class="modal-header">
-                            <h5 class="modal-title" id="serviceDetailModalLabel">Detail Layanan</h5>
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
                         <div class="modal-body" id="serviceDetailModalContent">
                             <!-- Konten detail booking akan dimasukkan di sini -->
                         </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
-                        </div>
+
                     </div>
                 </div>
             </div>

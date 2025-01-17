@@ -68,6 +68,13 @@
                         'description' => 'perawat dan tugas'
                     ],
                     [
+                        'icon' => 'fa-star',
+                        'label' => 'Reviews',
+                        'route' => 'user.reviews',
+                        'color' => 'from-green-500 to-green-600',
+                        'description' => 'Pantau ulasan'
+                    ],
+                    [
                         'icon' => 'fa-user',
                         'label' => 'Profil',
                         'route' => 'user.profile',

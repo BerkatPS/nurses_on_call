@@ -54,7 +54,7 @@ class UserEmergencyController extends Controller
     // Mendapatkan panggilan darurat berdasarkan filter
     protected function getFilteredCalls($userId, $status)
     {
-        $query = EmergencyCall::where('user_id', $userId);
+        $query = EmergencyCall::where('user_id', $userId)->orderBy('created_at', 'desc');
 
         if ($status !== 'all') {
             $query->where('status', $status);

@@ -5,25 +5,27 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Nurse On Call - Solusi Kesehatan Profesional</title>
 
-    <!-- Tailwind CSS & Alpine.js -->
+    <!-- Critical Dependencies -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
 
-    <!-- Font & Icons -->
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Fonts & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
 
     <script>
         tailwind.config = {
             theme: {
                 extend: {
                     fontFamily: {
-                        'sans': ['Plus Jakarta Sans', 'ui-sans-serif', 'system-ui']
+                        'sans': ['Inter', 'ui-sans-serif', 'system-ui']
                     },
                     colors: {
                         primary: {
                             DEFAULT: '#3B82F6',
-                            50: '#EFF6FF',
+                            50: '#E6F2FF',
                             100: '#DBEAFE',
                             500: '#3B82F6',
                             900: '#1E40AF'
@@ -33,10 +35,6 @@
                             50: '#ECFDF5',
                             500: '#10B981'
                         }
-                    },
-                    animation: {
-                        'bounce-slow': 'bounce 2s infinite',
-                        'pulse-slow': 'pulse 3s infinite'
                     }
                 }
             }
@@ -44,39 +42,52 @@
     </script>
 
     <style>
-        html { scroll-behavior: smooth; }
-        .section-reveal { opacity: 0; transform: translateY(20px); transition: all 0.8s ease; }
-        .section-reveal.active { opacity: 1; transform: translateY(0); }
+        html {
+            scroll-behavior: smooth;
+            font-family: 'Inter', sans-serif;
+        }
+        .custom-gradient {
+            background: linear-gradient(135deg, #3B82F6 0%, #3B82F6 50%, #1E40AF 100%);
+        }
+        .glassmorphism {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
     </style>
 </head>
-<body x-data="{
-    mobileMenuOpen: false,
-    scrollPosition: 0,
-    checkScroll() {
-        this.scrollPosition = window.pageYOffset;
-    }
-}"
-      @scroll.window="checkScroll()"
-      class="bg-white text-gray-800 font-sans">
-
-<!-- Navigasi Responsif -->
+<body
+    x-data="{
+        mobileMenuOpen: false,
+        scrollPosition: 0,
+        checkScroll() {
+            this.scrollPosition = window.pageYOffset;
+        }
+    }"
+    @scroll.window="checkScroll()"
+    class="bg-gray-50 text-gray-800"
+>
+<!-- Modern Responsive Navigation -->
 <nav
-    x-data="{ scrolled: false }"
-    :class="{ 'bg-white/90 shadow-md': window.pageYOffset > 50, 'bg-transparent': window.pageYOffset <= 50 }"
     class="fixed w-full z-50 transition-all duration-300 ease-in-out"
+    :class="{
+            'bg-white/90 shadow-md': scrollPosition > 50,
+            'bg-transparent': scrollPosition <= 50
+        }"
 >
     <div class="container mx-auto px-4 py-4 flex justify-between items-center">
-        <!-- Logo -->
-        <div class="flex items-center space-x-2">
-            <i class="fas fa-first-aid text-primary text-3xl"></i>
+        <div class="flex items-center space-x-3">
+            <img src="{{ asset('images/logo.png') }}" alt="Nurse On Call" class="h-10 w-10 rounded-full">
             <span class="text-2xl font-bold text-primary">Nurse On Call</span>
         </div>
 
-        <!-- Desktop Menu -->
+        <!-- Desktop Navigation -->
         <div class="hidden md:flex items-center space-x-6">
-            <a href="#home" class="text-gray-600 hover:text-primary transition">Beranda</a>
-            <a href="#features" class="text-gray-600 hover:text-primary transition">Layanan</a>
-            <a href="#testimonials" class="text-gray-600 hover:text-primary transition">Testimoni</a>
+            <nav class="flex space-x-6">
+                <a href="#home" class="text-gray-600 hover:text-primary transition">Beranda</a>
+                <a href="#services" class="text-gray-600 hover:text-primary transition">Layanan</a>
+                <a href="#testimonials" class="text-gray-600 hover:text-primary transition">Testimoni</a>
+            </nav>
 
             <div class="space-x-3">
                 <a href="{{ route('login') }}" class="px-4 py-2 border border-primary text-primary rounded-lg hover:bg-primary hover:text-white transition">
@@ -93,73 +104,90 @@
             @click="mobileMenuOpen = !mobileMenuOpen"
             class="md:hidden text-primary text-2xl focus:outline-none"
         >
-            <i class="fas fa-bars"></i>
+            <i class="fas" :class="mobileMenuOpen ? 'fa-times' : 'fa-bars'"></i>
         </button>
+    </div>
+
+    <!-- Mobile Menu -->
+    <div
+        x-show="mobileMenuOpen"
+        x-transition
+        class="md:hidden fixed inset-0 bg-white z-40 p-6"
+    >
+        <div class="flex flex-col space-y-6 text-center">
+            <a href="#home" @click="mobileMenuOpen = false" class="text-xl text-gray-600 hover:text-primary">Beranda</a>
+            <a href="#services" @click="mobileMenuOpen = false" class="text-xl text-gray-600 hover:text-primary">Layanan</a>
+            <a href="#testimonials" @click="mobileMenuOpen = false" class="text-xl text-gray-600 hover:text-primary">Testimoni</a>
+            <div class="flex flex-col space-y-4 pt-4">
+                <a href="{{ route('login') }}" class="px-6 py-3 border border-primary text-primary rounded-lg">
+                    Masuk
+                </a>
+                <a href="{{ route('register') }}" class="px-6 py-3 bg-primary text-white rounded-lg">
+                    Daftar
+                </a>
+            </div>
+        </div>
     </div>
 </nav>
 
 <!-- Hero Section -->
-<section
+<header
     id="home"
-    class="relative min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/10 to-blue-100/20"
+    class="relative min-h-screen flex items-center justify-center custom-gradient text-white"
 >
     <div class="container mx-auto px-4 grid md:grid-cols-2 gap-12 items-center">
-        <div class="space-y-6 text-center md:text-left">
-            <h1 class="text-5xl font-bold text-primary leading-tight">
+        <div
+            data-aos="fade-right"
+            class="space-y-6 text-center md:text-left"
+        >
+            <h1 class="text-5xl font-bold leading-tight">
                 Kesehatan Profesional, Seketika
             </h1>
-            <p class="text-gray-600 text-lg">
+            <p class="text-lg opacity-80">
                 Platform kesehatan digital terdepan dengan perawat profesional siap melayani kebutuhan medis Anda.
             </p>
-
             <div class="flex justify-center md:justify-start space-x-4">
-                <a href="{{ route('login') }}" class="px-6 py-3 bg-primary text-white rounded-lg hover:bg-blue-700 transition flex items-center space-x-2">
+                <a
+                    href="{{ route('login') }}"
+                    class="px-6 py-3 bg-white text-primary rounded-lg hover:bg-gray-100 transition flex items-center space-x-2"
+                >
                     <i class="fas fa-ambulance"></i>
                     <span>Layanan Darurat</span>
                 </a>
-                <a href="{{ route('login') }}" class="px-6 py-3 border border-primary text-primary rounded-lg hover:bg-primary hover:text-white transition flex items-center space-x-2">
+                <a
+                    href="{{ route('login') }}"
+                    class="px-6 py-3 border border-white text-white rounded-lg hover:bg-white/20 transition flex items-center space-x-2"
+                >
                     <i class="fas fa-calendar-alt"></i>
                     <span>Booking Perawat</span>
                 </a>
             </div>
         </div>
-
-        <div class="hidden md:block">
+        <div
+            data-aos="fade-left"
+            class="hidden md:block"
+        >
             <img
                 src="{{ asset('images/nurse.png') }}"
                 alt="Medical Illustration"
-                class="w-full max-w-md animate-bounce-slow"
+                class="w-full max-w-md mx-auto"
             />
         </div>
     </div>
-</section>
+</header>
 
 <!-- Layanan Section -->
-<section id="features" class="py-20 bg-white">
+<section id="services" class="py-20 bg-white">
     <div class="container mx-auto px-4 text-center">
         <h2 class="text-4xl font-bold text-primary mb-12">Layanan Kami</h2>
-
         <div class="grid md:grid-cols-3 gap-8">
             @php
                 $services = [
-                    [
-                        'icon' => 'fa-ambulance',
-                        'title' => 'Layanan Darurat',
-                        'description' => 'Respon cepat dalam 15 menit dengan tim medis berpengalaman.'
-                    ],
-                    [
-                        'icon' => 'fa-home',
-                        'title' => 'Home Care',
-                        'description' => 'Perawatan komprehensif di kenyamanan rumah Anda.'
-                    ],
-                    [
-                        'icon' => 'fa-user-md',
-                        'title' => 'Perawat Profesional',
-                        'description' => 'Tenaga medis tersertifikasi dengan pengalaman terjamin.'
-                    ]
+                    ['icon' => 'fa-ambulance', 'title' => 'Layanan Darurat', 'description' => 'Respon cepat dalam 15 menit dengan tim medis berpengalaman.'],
+                    ['icon' => 'fa-home', 'title' => 'Home Care', 'description' => 'Perawatan komprehensif di kenyamanan rumah Anda.'],
+                    ['icon' => 'fa-user-md', 'title' => 'Perawat Profesional', 'description' => 'Tenaga medis tersertifikasi dengan pengalaman terjamin.']
                 ];
             @endphp
-
             @foreach($services as $service)
                 <div class="bg-white p-8 rounded-xl shadow-lg hover:shadow-xl transition transform hover:-translate-y-2">
                     <div class="text-5xl flex justify-center mb-4 text-primary">
@@ -179,18 +207,8 @@
         <h2 class="text-4xl font-bold text-primary mb-12">Apa Kata Mereka</h2>
         @php
             $testimonials = [
-                [
-                    'name' => 'Sarah Kumalasari',
-                    'role' => 'Pasien Homecare',
-                    'quote' => 'Pelayanan luar biasa! Perawat profesional, empati, dan sangat membantu.',
-                    'rating' => 5
-                ],
-                [
-                    'name' => 'Dr. Michael Rusli',
-                    'role' => 'Praktisi Medis',
-                    'quote' => 'Nurse On Call mengubah paradigma layanan kesehatan dengan teknologi canggih.',
-                    'rating' => 5
-                ]
+                ['name' => 'Sarah Kumalasari', 'role' => 'Pasien Homecare', 'quote' => 'Pelayanan luar biasa! Perawat profesional, empati, dan sangat membantu.', 'rating' => 5],
+                ['name' => 'Dr. Michael Rusli', 'role' => 'Praktisi Medis', 'quote' => 'Nurse On Call mengubah paradigma layanan kesehatan dengan teknologi canggih.', 'rating' => 5]
             ];
         @endphp
         <div class="grid md:grid-cols-2 gap-8">
@@ -220,12 +238,8 @@
         <h2 class="text-4xl font-bold mb-6">Siap Memulai Perjalanan Kesehatan Anda?</h2>
         <p class="text-xl mb-8">Dapatkan layanan perawatan profesional hanya dengan beberapa klik</p>
         <div class="flex justify-center space-x-4">
-            <a href="{{ route('register') }}" class="bg-white text-primary px-6 py-3 rounded-lg hover:bg-gray-200 transition">
-                Daftar Sekarang
-            </a>
-            <a href="{{ route('login') }}" class="border-2 border-white text-white px-6 py-3 rounded-lg hover:bg-gray-200 hover:text-primary transition">
-                Masuk
-            </a>
+            <a href="{{ route('register') }}" class="bg-white text-primary px-6 py-3 rounded-lg hover:bg-gray-200 transition">Daftar Sekarang</a>
+            <a href="{{ route('login') }}" class="border-2 border-white text-white px-6 py-3 rounded-lg hover:bg-gray-200 hover:text-primary transition">Masuk</a>
         </div>
     </div>
 </section>
@@ -241,32 +255,9 @@
     </div>
 </footer>
 
-<!-- Mobile Menu -->
-<div x-show="mobileMenuOpen" @click.away="mobileMenuOpen = false" class="fixed inset-0 bg-white z-40 transition-transform transform" >
-    <div class="container mx-auto px-4 py-6">
-        <div class="flex justify-between items-center mb-8">
-            <div class="flex items-center space-x-2">
-                <img src="{{ asset('images/nurse.png') }}" alt="">
-                <span class="text-2xl font-bold text-primary">Nurse On Call</span>
-            </div>
-            <button @click="mobileMenuOpen = false" class="text-primary text-2xl focus:outline-none">
-                <i class="fas fa-times"></i>
-            </button>
-        </div>
-        <nav class="space-y-6">
-            <a href="#home" class="block text-xl text-gray-700 hover:text-primary">Beranda</a>
-            <a href="#features" class="block text-xl text-gray-700 hover:text-primary">Layanan</a>
-            <a href="#testimonials" class="block text-xl text-gray-700 hover:text-primary">Testimoni</a>
-            <div class="space-y-4 pt-6 border-t border-gray-300">
-                <a href="{{ route('login') }}" class="block w-full text-center px-4 py-3 text-primary border border-primary rounded-lg hover:bg-primary hover:text-white transition">Masuk</a>
-                <a href="{{ route('register') }}" class="block w-full text-center px-4 py-3 bg-primary text-white rounded-lg hover:bg-blue-700 transition">Daftar</a>
-            </div>
-        </nav>
-    </div>
-</div>
-
 <!-- Script untuk Mobile Menu -->
 <script>
+    AOS.init();
     document.addEventListener('DOMContentLoaded', function() {
         const mobileMenuToggle = document.getElementById('mobile-menu-toggle');
         const mobileMenuClose = document.getElementById('mobile-menu-close');
@@ -275,8 +266,8 @@
 
         // Toggle Mobile Menu
         mobileMenuToggle.addEventListener('click', function() {
-            mobileMenu.classList.remove('translate-x-full');
-            mobileMenu.classList.add('translate-x-0');
+            mobileMenu.classList.toggle('translate-x-full');
+            mobileMenu.classList.toggle('translate-x-0');
         });
 
         // Close Mobile Menu

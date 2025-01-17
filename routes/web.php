@@ -6,11 +6,13 @@ use App\Http\Controllers\Nurse\EmergencyController;
 use App\Http\Controllers\Nurse\NurseBookingController;
 use App\Http\Controllers\Nurse\NurseController;
 use App\Http\Controllers\Nurse\NurseProfileController;
+use App\Http\Controllers\Nurse\NurseReviewController;
 use App\Http\Controllers\User\UserBookingController;
 use App\Http\Controllers\User\UserController;
 use App\Http\Controllers\User\UserEmergencyController;
 use App\Http\Controllers\User\UserListNurseController;
 use App\Http\Controllers\User\UserProfileController;
+use App\Http\Controllers\User\UserReviewController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -63,14 +65,29 @@ Route::middleware(['auth'])->group(function() {
     Route::get('/nurse/bookings', [NurseBookingController::class, 'index'])
         ->name('nurse.bookings');
 
-    Route::post('/nurse/bookings/{booking}/confirm', [NurseController::class, 'confirmBooking'])->name('nurse.bookings.confirm');
+    Route::post('/nurse/bookings/{booking}/confirm', [NurseController::class, 'confirmBooking'])
+        ->name('nurse.bookings.confirm');
 
     Route::get('/nurse/bookings/{bookingId}', [NurseBookingController::class, 'show'])
         ->name('nurse.bookings.show');
 
+    Route::post('/nurse/bookings/{bookingId}/status', [NurseBookingController::class, 'updateBookingStatus'])
+        ->name('nurse.bookings.updateStatus');
+
 
     Route::post('/nurse/bookings/{bookingId}/cancel', [NurseBookingController::class, 'cancelBooking'])
         ->name('nurse.bookings.cancel');
+
+    Route::post('/nurse/bookings/{bookingId}/confirm', [NurseBookingController::class, 'confirmBooking']);
+    Route::post('/nurse/bookings/{bookingId}/complete', [NurseBookingController::class, 'completeBooking']);
+
+    Route::get('/nurse/bookings/active', [NurseBookingController::class, 'getActiveBookings'])
+        ->name('nurse.bookings.active');
+
+    Route::get('/nurse/bookings/upcoming', [NurseBookingController::class, 'upcomingServices'])
+        ->name('nurse.bookings.upcoming');
+
+    Route::post('/nurse/bookings/{bookingId}/upload-proof', [NurseBookingController::class, 'uploadProof']);
 
     Route::get('/nurse/emergency', [EmergencyController::class, 'index'])
         ->name('nurse.emergency');
@@ -90,6 +107,12 @@ Route::middleware(['auth'])->group(function() {
     Route::post('/nurse/profile/update', [NurseProfileController::class, 'updateProfile'])
         ->name('nurse.profile.update');
 
+    Route::get('/nurse/reviews', [NurseReviewController::class, 'index'])
+        ->name('nurse.reviews');
+
+    Route::get('/nurse/reviews/{id}', [NurseReviewController::class, 'show'])
+        ->name('nurse.reviews.show');
+
 
     Route::get('/users', [UserController::class, 'index'])
         ->name('user.index');
@@ -104,29 +127,37 @@ Route::middleware(['auth'])->group(function() {
     Route::get('/user/bookings/{bookingId}', [UserBookingController::class, 'show'])
     ->name('user.bookings.show');
 
-    Route::put('/user/bookings/{bookingId}/cancel', [UserBookingController::class, 'cancel'])->name('user.bookings.cancel');
+    Route::put('/user/bookings/{bookingId}/cancel', [UserBookingController::class, 'cancel'])
+        ->name('user.bookings.cancel');
 
-    Route::get('/user/emergency-calls', [UserEmergencyController::class, 'index'])->name('user.emergency');
+    Route::get('/user/emergency-calls', [UserEmergencyController::class, 'index'])
+        ->name('user.emergency');
 
     Route::post('/user/emergency-calls', [UserEmergencyController::class, 'createEmergencyCall'])
         ->name('user.emergency.create');
 
     // Rute untuk membatalkan panggilan darurat
-    Route::post('/user/emergency-calls/{id}/cancel', [UserEmergencyController::class, 'cancelEmergencyCall'])->name('user.emergency.cancel');
+    Route::post('/user/emergency-calls/{id}/cancel', [UserEmergencyController::class, 'cancelEmergencyCall'])
+        ->name('user.emergency.cancel');
 
     // Rute untuk mendapatkan detail panggilan darurat
-    Route::get('/user/emergency-calls/{id}', [UserEmergencyController::class, 'getEmergencyCallDetail'])->name('user.emergency.detail');
+    Route::get('/user/emergency-calls/{id}', [UserEmergencyController::class, 'getEmergencyCallDetail'])
+        ->name('user.emergency.detail');
 
-    Route::get('/user/profile', [UserProfileController::class, 'index'])->name('user.profile');
+    Route::get('/user/profile', [UserProfileController::class, 'index'])
+        ->name('user.profile');
 
     // Rute untuk memperbarui profil
-    Route::post('/user/profile', [UserProfileController::class, 'update'])->name('user.profile.update');
+    Route::post('/user/profile', [UserProfileController::class, 'update'])
+        ->name('user.profile.update');
 
     // Rute untuk mengubah password
-    Route::post('/user/profile/change-password', [UserProfileController::class, 'changePassword'])->name('user.profile.changePassword');
+    Route::post('/user/profile/change-password', [UserProfileController::class, 'changePassword'])
+        ->name('user.profile.changePassword');
 
     // Rute untuk mengunggah avatar
-    Route::post('/user/profile/upload-avatar', [UserProfileController::class, 'uploadAvatar'])->name('user.profile.uploadAvatar');
+    Route::post('/user/profile/upload-avatar', [UserProfileController::class, 'uploadAvatar'])
+        ->name('user.profile.uploadAvatar');
 
 
     Route::get('/user/nurses', [UserListNurseController::class, 'index'])
@@ -137,9 +168,11 @@ Route::middleware(['auth'])->group(function() {
     Route::get('/user/nurses/{id}', [UserListNurseController::class, 'show'])
         ->name('user.nurses.show');
 
+    Route::get('/user/reviews', [UserReviewController::class, 'index'])
+        ->name('user.reviews');
 
-
-
+    Route::post('/user/reviews', [UserReviewController::class, 'store'])
+        ->name('user.reviews.store');
 });
 
 // Fallback Route

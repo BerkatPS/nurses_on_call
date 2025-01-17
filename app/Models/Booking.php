@@ -18,7 +18,8 @@ class Booking extends Model
         'end_time',
         'total_amount',
         'emergency_level',
-        'notes'
+        'notes',
+        'file_path'
     ];
 
     protected $dates = [

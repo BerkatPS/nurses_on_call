@@ -41,7 +41,7 @@ class NurseController extends Controller
     protected function getActiveAssignments(Nurse $nurse)
     {
         return Booking::where('nurse_id', $nurse->id)
-            ->whereIn('status', ['pending', 'confirmed'])
+            ->where('status', 'pending')
             ->with(['user', 'service'])
             ->get()
             ->map(function($booking) {
