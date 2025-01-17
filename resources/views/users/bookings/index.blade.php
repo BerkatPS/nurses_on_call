@@ -200,9 +200,9 @@
                             <h3 class="text-xl font-bold text-gray-800 mb-2">{{ $service->name }}</h3>
                             <p class="text-gray-600 mb-4">{{ $service->description }}</p>
                             <div class="flex justify-between items-center mb-4">
-                                <span class="text-blue-600 font-semibold">
-                                    Rp {{ number_format($service->base_price, 0, ',', '.') }}
-                                </span>
+                        <span class="text-blue-600 font-semibold">
+                            Rp {{ number_format($service->base_price, 0, ',', '.') }}
+                        </span>
                                 <button
                                     onclick="selectService('{{ $service->id }}')"
                                     class="px-4 py-2 bg-blue-500 text-white rounded-full hover:bg-blue-600 transition-all duration-300 transform hover:scale-105"
@@ -210,7 +210,7 @@
                                     Pilih
                                 </button>
                             </div>
-                            <div class="absolute top-0 right-0 w-16 h-16 bg-blue-500 transform rotate-45 translate-x-1/2 -translate-y-1/2 opacity-10"></div>
+                            <div class="absolute top-0 right-0 w-16 h-16 bg-blue-500 transform rotate-45 translate-x- 1/2 -translate-y-1/2 opacity-10"></div>
                         </div>
                     @endforeach
                 </div>
@@ -442,13 +442,17 @@
 
         function closeModal(modalId) {
             const modal = document.getElementById(modalId);
-            const modalContent = modal.querySelector('.bg-white');
-            modalContent.classList.add('scale-95', 'opacity-0');
-            modalContent.classList.remove('scale-100', 'opacity-100');
-            setTimeout(() => {
-                modal.classList.remove('flex');
-                modal.classList.add('hidden');
-            }, 300);
+            if (modal) {
+                const modalContent = modal.querySelector('.bg-white');
+                modalContent.classList.add('scale-95', 'opacity-0');
+                modalContent.classList.remove('scale-100', 'opacity-100');
+                setTimeout(() => {
+                    modal.classList.remove('flex');
+                    modal.classList.add('hidden');
+                }, 300);
+            } else {
+                console.error(`Modal dengan ID ${modalId} tidak ditemukan.`);
+            }
         }
 
 
@@ -525,7 +529,7 @@
                                         <div class="bg-purple-50 p-4 rounded-xl shadow-sm">
                                             <h4 class="text-sm font-semibold text-purple-600 mb-2">Status & Biaya</h4>
                                             <p class="font-medium mb-2">
-                                                <span class="px-3 py-1 rounded-full ${getStatusClass(data.status)} text-sm">
+                                                <span class ="px-3 py-1 rounded-full ${getStatusClass(data.status)} text-sm">
                                                     ${data.status.toUpperCase()}
                                                 </span>
                                             </p>
@@ -538,6 +542,13 @@
                                             </p>
                                         </div>
                                     </div>
+                                </div>
+
+                                <!-- Bukti Foto -->
+
+                                <div class="mt-6">
+                                    <h4 class="text-lg font-semibold text-gray-800 mb-2">Bukti Foto</h4>
+                                        <img src="${data.file_path}" alt="Bukti Foto" class="w-full h-auto rounded-lg shadow-md" />
                                 </div>
                             </div>
                         </div>

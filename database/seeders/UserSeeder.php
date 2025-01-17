@@ -40,8 +40,8 @@ class UserSeeder extends Seeder
 
         // Nurse
         User::create([
-            'name' => 'Sarah Johnson',
-            'email' => 'sarah@example.com',
+            'name' => 'Kim San',
+            'email' => 'kim@example.com',
             'phone' => '+6281234567894',
             'password' => Hash::make('nurse123'),
             'role' => 'nurse',
@@ -50,12 +50,42 @@ class UserSeeder extends Seeder
         ]);
 
         User::create([
-            'name' => 'Michael Brown',
-            'email' => 'michael@example.com',
+            'name' => 'Isna Salbia',
+            'email' => 'isna@example.com',
             'phone' => '+6281234567895',
             'password' => Hash::make('nurse456'),
             'role' => 'nurse',
             'address' => 'Jl. Perawat No. 2',
+            'verified' => true
+        ]);
+
+        User::create([
+            'name' => 'Brian Wahjudi',
+            'email' => 'brian@example.com',
+            'phone' => '+6281234567896',
+            'password' => Hash::make('nurse789'),
+            'role' => 'nurse',
+            'address' => 'Jl. Perawat No. 3',
+            'verified' => true
+        ]);
+
+        User::create([
+            'name' => 'Febita Famelia',
+            'email' => 'febita@example.com',
+            'phone' => '+6281234567897',
+            'password' => Hash::make('nurse101'),
+            'role' => 'nurse',
+            'address' => 'Jl. Perawat No. 4',
+            'verified' => true
+        ]);
+
+        User::create([
+            'name' => 'Saphira Eva',
+            'email' => 'saphira@example.com',
+            'phone' => '+6281234567898',
+            'password' => Hash::make('nurse202'),
+            'role' => 'nurse',
+            'address' => 'Jl. Perawat No. 5',
             'verified' => true
         ]);
     }

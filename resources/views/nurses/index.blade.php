@@ -60,7 +60,7 @@
                 <div class="md:col-span-2 bg-white/80 backdrop-blur-lg rounded-3xl shadow-2xl p-8 border border-white/20 transform hover:scale-[1.02] transition-all duration-300">
                     <div class="flex justify-between items-center mb-6">
                         <h2 class="text-3xl font-bold text-blue-600">Tugas Aktif</h2>
-                        <a href="#" class="text-blue-500 hover:text-blue-700 transition">Lihat Semua</a>
+                        <a href="/nurse/bookings" class="text-blue-500 hover:text-blue-700 transition">Lihat Semua</a>
                     </div>
                     <div class="space-y-6">
                         @forelse($activeAssignments as $assignment)
@@ -132,13 +132,13 @@
                 </div>
             </div>
 
-            <!-- Grafik Kinerja -->
-            <div class="">
-                <div class="bg-white/80 backdrop-blur-lg rounded-3xl shadow-2xl p-8 border border-white/20 transform hover:scale-[1.02] transition-all duration-300">
-                    <h3 class="text-3xl font-bold text-blue-600 mb-6">Kinerja Bulanan</h3>
-                    <canvas id="performanceChart" class="w-full h-96"></canvas>
-                </div>
-            </div>
+{{--            <!-- Grafik Kinerja -->--}}
+{{--            <div class="">--}}
+{{--                <div class="bg-white/80 backdrop-blur-lg rounded-3xl shadow-2xl p-8 border border-white/20 transform hover:scale-[1.02] transition-all duration-300">--}}
+{{--                    <h3 class="text-3xl font-bold text-blue-600 mb-6">Kinerja Bulanan</h3>--}}
+{{--                    <canvas id="performanceChart" class="w-full h-96"></canvas>--}}
+{{--                </div>--}}
+{{--            </div>--}}
 
             <div class="modal fade" id="serviceDetailModal" tabindex="-1" aria-labelledby="serviceDetailModalLabel" aria-hidden="true">
                 <div class="modal-dialog modal-lg">

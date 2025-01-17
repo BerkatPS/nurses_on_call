@@ -65,7 +65,6 @@ class NurseBookingController extends Controller
     {
         return Booking::where('nurse_id', $nurse->id)
             ->where('status', 'confirmed')
-            ->where('start_time', '>', now())
             ->with('service')
             ->get()
             ->map(function($booking) {
@@ -115,155 +114,85 @@ class NurseBookingController extends Controller
 
         // Validasi kepemilikan booking
         if ($booking->nurse_id !== $nurse->id) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Anda tidak memiliki izin untuk mengubah status booking ini.'
-            ], 403);
+            return response()->json(['success' => false, 'message' => 'Anda tidak memiliki izin untuk mengubah status booking ini.'], 403);
         }
 
         $validatedData = $request->validate([
-            'status' => 'required|in:in_progress,completed,cancelled'
+            'status' => 'required|in:pending,confirmed,completed,cancelled'
         ]);
 
         try {
             // Update status booking
-            $booking->update([
-                'status' => $validatedData['status']
-            ]);
+            $booking->update(['status' => $validatedData['status']]);
 
-            return response()->json([
-                'success' => true,
-                'message' => 'Status booking berhasil diperbarui.',
-                'booking' => $booking
-            ]);
+            return response()->json(['success' => true, 'message' => 'Status booking berhasil diperbarui.']);
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Gagal memperbarui status booking.'
-            ], 500);
+            return response()->json(['success' => false, 'message' => 'Gagal memperbarui status booking: ' . $e->getMessage()], 500);
         }
     }
 
-    public function cancelBooking($bookingId)
-    {
+    public function cancelBooking($bookingId) {
         $nurse = Auth::user()->nurse;
         $booking = Booking::findOrFail($bookingId);
 
         // Validasi kepemilikan booking
         if ($booking->nurse_id !== $nurse->id) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Anda tidak memiliki izin untuk membatalkan booking ini.'
-            ], 403);
+            return response()->json(['success' => false, 'message' => 'Anda tidak memiliki izin untuk membatalkan booking ini.'], 403);
         }
 
         try {
             // Update status booking menjadi 'cancelled'
             $booking->update(['status' => 'cancelled']);
-
-            return response()->json([
-                'success' => true,
-                'message' => 'Booking berhasil dibatalkan.'
-            ]);
+            return response()->json(['success' => true, 'message' => 'Booking berhasil dibatalkan.']);
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Gagal membatalkan booking: ' . $e->getMessage()
-            ], 500);
+            return response()->json(['success' => false, 'message' => 'Gagal membatalkan booking: ' . $e->getMessage()], 500);
         }
     }
 
-    public function confirmBooking($bookingId)
+    public function completeBooking($bookingId): \Illuminate\Http\JsonResponse
     {
         $nurse = Auth::user()->nurse;
         $booking = Booking::findOrFail($bookingId);
 
         // Validasi kepemilikan booking
         if ($booking->nurse_id !== $nurse->id) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Anda tidak memiliki izin untuk mengkonfirmasi booking ini.'
-            ], 403);
-        }
-
-        try {
-            // Update status booking menjadi 'confirmed'
-            $booking->update(['status' => 'confirmed']);
-
-            return response()->json([
-                'success' => true,
-                'message' => 'Booking berhasil dikonfirmasi.'
-            ]);
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Gagal mengkonfirmasi booking: ' . $e->getMessage()
-            ], 500);
-        }
-    }
-
-    public function completeBooking($bookingId)
-    {
-        $nurse = Auth::user()->nurse;
-        $booking = Booking::findOrFail($bookingId);
-
-        // Validasi kepemilikan booking
-        if ($booking->nurse_id !== $nurse->id) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Anda tidak memiliki izin untuk menyelesaikan booking ini.'
-            ], 403);
+            return response()->json(['success' => false, 'message' => 'Anda tidak memiliki izin untuk menyelesaikan booking ini.'], 403);
         }
 
         try {
             // Update status booking menjadi 'completed'
             $booking->update(['status' => 'completed']);
-
-            return response()->json([
-                'success' => true,
-                'message' => 'Booking berhasil diselesaikan.'
-            ]);
+            return response()->json(['success' => true, 'message' => 'Booking berhasil diselesaikan.']);
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Gagal menyelesaikan booking: ' . $e->getMessage()
-            ], 500);
+            return response()->json(['success' => false, 'message' => 'Gagal menyelesaikan booking: ' . $e->getMessage
+        ()], 500);
+            }
         }
-    }
+
 
     public function uploadProof(Request $request, $bookingId)
     {
         $request->validate([
-            'file' => 'required|file|mimes:pdf,jpg,jpeg,png|max:2048', // Validasi file
+            'proof' => 'required|file|mimes:pdf,jpg,jpeg,png|max:2048', // Validasi file
         ]);
 
         $booking = Booking::findOrFail($bookingId);
 
         // Validasi kepemilikan booking
         if ($booking->nurse_id !== Auth::user()->nurse->id) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Anda tidak memiliki izin untuk mengupload bukti ini.'
-            ], 403);
+            return response()->json(['success' => false, 'message' => 'Anda tidak memiliki izin untuk mengupload bukti ini.'], 403);
         }
 
         try {
             // Upload file
-            $filePath = $request->file('file')->store('uploads', 'public'); // Simpan file di storage/app/public/uploads
+            $filePath = $request->file('proof')->store('uploads', 'public'); // Simpan file di storage/app/public/uploads
 
             // Update booking dengan file path
             $booking->update(['file_path' => $filePath]);
 
-            return response()->json([
-                'success' => true,
-                'message' => 'Bukti berhasil diupload.',
-                'file_path' => $filePath
-            ]);
+            return response()->json(['success' => true, 'message' => 'Bukti berhasil diupload.', 'file_path' => Storage::url($filePath)]);
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Gagal mengupload bukti: ' . $e->getMessage()
-            ], 500);
+            return response()->json(['success' => false, 'message' => 'Gagal mengupload bukti: ' . $e->getMessage()], 500);
         }
     }
 

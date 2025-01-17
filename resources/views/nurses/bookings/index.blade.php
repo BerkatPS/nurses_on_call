@@ -7,14 +7,10 @@
         <div class="container mx-auto space-y-8">
             <!-- Header Jadwal Layanan -->
             <div class="bg-white/80 backdrop-blur-lg rounded-3xl shadow-2xl p-8 border border-white/20">
-                <div class="flex justify-between items-center">
-                    <div>
-                        <h2 class="text-4xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-indigo-600 mb-4">
-                            Jadwal Layanan
-                        </h2>
-                        <p class="text-xl text-gray-600">Kelola dan pantau semua layanan Anda dengan mudah</p>
-                    </div>
-                </div>
+                <h2 class="text-4xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-indigo-600 mb-4">
+                    Jadwal Layanan
+                </h2>
+                <p class="text-xl text-gray-600">Kelola dan pantau semua layanan Anda dengan mudah</p>
             </div>
 
             <!-- Statistik Ringkasan -->
@@ -74,15 +70,14 @@
                                         </button>
                                     @elseif($booking->status === 'confirmed')
                                         <button
-                                            onclick="updateBookingStatus({{ $booking->id }}, 'completed')"
+                                            onclick="showCompleteModal({{ json_encode($booking) }})"
                                             class="px-4 py-2 bg-green-500 text-white rounded-full hover:bg-green-600 transition"
                                         >
                                             Selesaikan
                                         </button>
                                     @elseif($booking->status === 'completed')
-                                        <button
-                                            onclick="showUploadProofModal({{ $booking->id }})"
-                                            class="px-4 py-2 bg-blue-500 text-white rounded-full hover:bg-blue-600 transition"
+                                        <button onclick="showUploadProofModal({{ $booking->id }})"
+                                                class="px-4 py-2 bg-blue-500 text-white rounded-full hover:bg-blue-600 transition"
                                         >
                                             Upload Bukti
                                         </button>
@@ -106,7 +101,6 @@
                         </div>
                     @endforelse
                 </div>
-
             </div>
 
             <!-- Daftar Layanan Mendatang -->
@@ -120,8 +114,8 @@
                                     {{ $service->type }}
                                 </h4>
                                 <span class="bg-blue-500 text-white px-3 py-1 rounded-full text-xs">
-                        {{ $service->status }}
-                    </span>
+                                    {{ $service->status }}
+                                </span>
                             </div>
 
                             <div class="flex justify-between items-center">
@@ -138,7 +132,7 @@
                                         Detail
                                     </button>
                                     <button
-                                        onclick="cancelUpcomingService({{ $service->id }})"
+                                        onclick="cancelBooking({{ $service->id }})"
                                         class="px-4 py-2 bg-red-500 text-white rounded-full hover:bg-red-600 transition"
                                     >
                                         Batalkan
@@ -153,6 +147,31 @@
                             <p class="text-gray-500 mt-2">Belum ada jadwal layanan yang akan datang</p>
                         </div>
                     @endforelse
+                </div>
+            </div>
+
+            <!-- Modal Upload Bukti -->
+            <div id="uploadProofModal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50 p-4">
+                <div class="bg-white rounded-3xl max-w-lg w-full p-8 relative transform transition-all duration-300 scale-95 opacity-0">
+                    <button
+                        onclick="closeModal('uploadProofModal')"
+                        class="absolute top-4 right-4 text-gray-500 hover:text-gray-800"
+                    >
+                        <i class="fas fa-times text-2xl"></i>
+                    </button>
+
+                    <h2 class="text-3xl font-bold text-center mb-4">Upload Bukti</h2>
+                    <input type="hidden" id="uploadBookingId" value="">
+                    <form id="uploadProofForm" enctype="multipart/form-data" method="POST">
+                        <div class="mb-4">
+                            <label for="proof" class="block text-gray-700">Pilih File Bukti:</label>
+                            <input type="file" id="proof" name="proof" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-200" required>
+                        </div>
+                        <div class="flex justify-end">
+                            <button type="submit" class="px-4 py-2 bg-green-500 text-white rounded-full hover:bg-green-600 transition">Upload</button>
+                            <button type="button" onclick="closeModal('uploadProofModal')" class="ml-2 px-4 py-2 bg-gray-300 text-gray-800 rounded-full hover:bg-gray-400 transition">Batal</button>
+                        </div>
+                    </form>
                 </div>
             </div>
 
@@ -203,10 +222,8 @@
                     @endforelse
                 </div>
             </div>
-
         </div>
     </div>
-
 
     <!-- Modal Detail Layanan -->
     <div id="serviceDetailModal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50 p-4">
@@ -218,8 +235,7 @@
                 <i class="fas fa-times text-2xl"></i>
             </button>
 
-            <div id="serviceDetailModalContent">
-            </div>
+            <div id="serviceDetailModalContent"></div>
         </div>
     </div>
 
@@ -251,14 +267,10 @@
             </div>
         </div>
     </div>
-    </div>
 @endsection
 
 @push('scripts')
     <script>
-
-        //completeUpcomingService
-
         function completeUpcomingService(serviceId) {
             fetch(`/nurse/bookings/${serviceId}/complete`, {
                 method: 'POST',
@@ -277,6 +289,7 @@
                 })
                 .catch(error => console.error('Error:', error));
         }
+
         function showUploadProofModal(bookingId) {
             document.getElementById('uploadBookingId').value = bookingId; // Set booking ID
             openModal('uploadProofModal'); // Open the modal
@@ -291,10 +304,19 @@
                 method: 'POST',
                 body: formData,
                 headers: {
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'Content-Type': 'multipart/form-data'
                 }
             })
-                .then(response => response.json())
+                .then(response => {
+                    // Periksa apakah respons adalah JSON
+                    if (!response.ok) {
+                        return response.text().then(text => {
+                            throw new Error(text); // Tangkap kesalahan jika respons tidak ok
+                        });
+                    }
+                    return response.json();
+                })
                 .then(data => {
                     if (data.success) {
                         alert(data.message);
@@ -303,8 +325,12 @@
                         alert(data.message);
                     }
                 })
-                .catch(error => console.error('Error:', error));
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Terjadi kesalahan: ' + error.message); // Tampilkan pesan kesalahan
+                });
         });
+
         function showBookingDetails(booking) {
             const modalContent = document.getElementById('serviceDetailModalContent');
 
@@ -374,9 +400,7 @@
                     class="px-4 py-2 bg-blue-500 text-white rounded-full hover:bg-blue-600 transition-all"
                 >
                     Tutup
-                </button>
-            </div>
-        `;
+                </button>`;
 
             openModal('serviceDetailModal');
         }
@@ -389,8 +413,8 @@
                 <h2 class="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-green-600 to-emerald-600 mb-4">
                     Detail Layanan Mendatang
                 </h2>
-            <p class="text-gray-600">Informasi lengkap tentang layanan yang akan datang</p>
-        </div>
+                <p class="text-gray-600">Informasi lengkap tentang layanan yang akan datang</p>
+            </div>
 
             <div class="grid md:grid-cols-2 gap-6">
                 <div>
@@ -442,30 +466,41 @@
                     Tutup
                 </button>
             </div>
-                `;
+        `;
 
-        openModal('serviceDetailModal');
-    }
+            openModal('serviceDetailModal');
+        }
 
-    function updateBookingStatus(bookingId, status) {
-        fetch(`/nurse/bookings/${bookingId}/update-status`, {
-            method: 'POST',
+        function updateBookingStatus(bookingId, status) {
+            fetch(`/nurse/bookings/${bookingId}/status`, {
+                method: 'POST',
                 headers: {
-                'Content-Type': 'application/json',
+                    'Content-Type': 'application/json',
                     'X-CSRF-TOKEN': '{{ csrf_token() }}'
-            },
-            body: JSON.stringify({ status })
-        })
-        .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    alert(data.message);
-                    location.reload(); // Reload the page to see the updated status
-                } else {
-                    alert(data.message);
-                }
+                },
+                body: JSON.stringify({ status })
             })
-            .catch(error => console.error('Error:', error));
+                .then(response => {
+                    // Periksa apakah respons adalah JSON
+                    if (!response.ok) {
+                        return response.text().then(text => {
+                            throw new Error(text); // Tangkap kesalahan jika respons tidak ok
+                        });
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.success) {
+                        alert(data.message);
+                        location.reload(); // Reload the page to see the updated status
+                    } else {
+                        alert(data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Terjadi kesalahan: ' + error.message); // Tampilkan pesan kesalahan
+                });
         }
 
         function showCompleteModal(booking) {
@@ -513,7 +548,7 @@
 
         function closeModal(modalId) {
             const modal = document.getElementById(modalId);
-            modal.querySelector('.bg-white'). classList.add('scale-95', 'opacity-0');
+            modal.querySelector('.bg-white').classList.add('scale-95', 'opacity-0');
             setTimeout(() => {
                 modal.classList.add('hidden');
                 modal.classList.remove('flex', 'opacity-100');
@@ -523,36 +558,6 @@
         function cancelBooking(bookingId) {
             if (confirm('Apakah Anda yakin ingin membatalkan layanan ini?')) {
                 fetch(`/nurse/bookings/${bookingId}/cancel`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                    }
-                })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            alert(data.message);
-                            location.reload();
-                        } else {
-                            alert(data.message);
-                        }
-                    })
-                    .catch(error => console.error('Error:', error));
-            }
-        }
-
-        function cancelUpcomingService(serviceId) {
-            Swal.fire({
-                title: 'Apakah Anda yakin ingin membatalkan layanan mendatang ini?',
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonText: 'Ya, Batalkan',
-                cancelButtonText: 'Batal',
-                reverseButtons: true
-            })
-            if (confirm('Apakah Anda yakin ingin membatalkan layanan mendatang ini?')) {
-                fetch(`/nurse/services/${serviceId}/cancel`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',

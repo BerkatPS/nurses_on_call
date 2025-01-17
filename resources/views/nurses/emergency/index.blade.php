@@ -105,19 +105,13 @@
                                     </div>
                                     <div class="flex space-x-2">
                                         @if($call->status === 'pending')
-                                            <button onclick="openEmergencyCallDetails({{ json_encode($call) }})"
-                                                    class="px-4 py-2 bg-blue-500 text-white rounded-full hover:bg-blue-600 transition-all">
-                                                Detail
-                                            </button>
+
                                             <button onclick="respondToEmergencyCall('{{ $call->id }}')"
                                                     class="px-4 py-2 bg-green-500 text-white rounded-full hover:bg-green-600 transition-all">
                                                 Tanggapi
                                             </button>
                                         @elseif($call->status === 'responded')
-                                            <button onclick="openEmergencyCallDetails({{ json_encode($call) }})"
-                                                    class="px-4 py-2 bg-blue-500 text-white rounded-full hover:bg-blue-600 transition-all">
-                                                Detail
-                                            </button>
+
                                             <button onclick="completeEmergencyCall('{{ $call->id }}')"
                                                     class="px-4 py-2 bg-green-500 text-white rounded-full hover:bg-green-600 transition-all">
                                                 Selesaikan

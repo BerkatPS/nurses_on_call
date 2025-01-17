@@ -5,15 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Nurse On Call - Solusi Kesehatan Profesional</title>
 
-    <!-- Critical Dependencies -->
+    <!-- CSS Dependencies -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
-    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
-
-    <!-- Fonts & Icons -->
+    <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
 
     <script>
         tailwind.config = {
@@ -24,16 +20,16 @@
                     },
                     colors: {
                         primary: {
-                            DEFAULT: '#3B82F6',
+                            DEFAULT: '#4A90E2',
                             50: '#E6F2FF',
-                            100: '#DBEAFE',
-                            500: '#3B82F6',
-                            900: '#1E40AF'
+                            100: '#B6D4F4',
+                            500: '#4A90E2',
+                            900: '#2C5E9E'
                         },
                         secondary: {
-                            DEFAULT: '#10B981',
-                            50: '#ECFDF5',
-                            500: '#10B981'
+                            DEFAULT: '#2ECC71',
+                            50: '#E9F7EF',
+                            500: '#2ECC71'
                         }
                     }
                 }
@@ -44,15 +40,12 @@
     <style>
         html {
             scroll-behavior: smooth;
-            font-family: 'Inter', sans-serif;
         }
-        .custom-gradient {
-            background: linear-gradient(135deg, #3B82F6 0%, #3B82F6 50%, #1E40AF 100%);
+        .elegant-gradient {
+            background: linear-gradient(135deg, #4A90E2 0%, #2C5E9E 100%);
         }
-        .glassmorphism {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+        .soft-shadow {
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.1);
         }
     </style>
 </head>
@@ -65,35 +58,35 @@
         }
     }"
     @scroll.window="checkScroll()"
-    class="bg-gray-50 text-gray-800"
+    class="bg-gray-50 font-sans"
 >
-<!-- Modern Responsive Navigation -->
+<!-- Navigation -->
 <nav
-    class="fixed w-full z-50 transition-all duration-300 ease-in-out"
+    class="fixed w-full z-50 transition-all duration-300"
     :class="{
-            'bg-white/90 shadow-md': scrollPosition > 50,
+            'bg-white shadow-md': scrollPosition > 50,
             'bg-transparent': scrollPosition <= 50
         }"
 >
     <div class="container mx-auto px-4 py-4 flex justify-between items-center">
         <div class="flex items-center space-x-3">
-            <img src="{{ asset('images/logo.png') }}" alt="Nurse On Call" class="h-10 w-10 rounded-full">
-            <span class="text-2xl font-bold text-primary">Nurse On Call</span>
+            <img src="{{ asset('images/nurse.png') }}" alt="Nurse On Call" class="h-10 w-10 rounded-full">
+            <span class="text-2xl font-bold text-primary-400">Nurse On Call</span>
         </div>
 
         <!-- Desktop Navigation -->
         <div class="hidden md:flex items-center space-x-6">
             <nav class="flex space-x-6">
-                <a href="#home" class="text-gray-600 hover:text-primary transition">Beranda</a>
-                <a href="#services" class="text-gray-600 hover:text-primary transition">Layanan</a>
-                <a href="#testimonials" class="text-gray-600 hover:text-primary transition">Testimoni</a>
+                <a href="#home" class="text-gray-800 hover:text-primary">Beranda</a>
+                <a href="#services" class="text-gray-800 hover:text-primary">Layanan</a>
+                <a href="#testimonials" class="text-gray-800 hover:text-primary">Testimoni</a>
             </nav>
 
             <div class="space-x-3">
-                <a href="{{ route('login') }}" class="px-4 py-2 border border-primary text-primary rounded-lg hover:bg-primary hover:text-white transition">
+                <a href="/login" class="px-4 py-2 border border-primary text-primary rounded-lg hover:bg-primary hover:text-white">
                     Masuk
                 </a>
-                <a href="{{ route('register') }}" class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-blue-700 transition">
+                <a href="/register" class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-blue-700">
                     Daftar
                 </a>
             </div>
@@ -102,7 +95,7 @@
         <!-- Mobile Menu Toggle -->
         <button
             @click="mobileMenuOpen = !mobileMenuOpen"
-            class="md:hidden text-primary text-2xl focus:outline-none"
+            class="md:hidden text-primary text-2xl"
         >
             <i class="fas" :class="mobileMenuOpen ? 'fa-times' : 'fa-bars'"></i>
         </button>
@@ -115,14 +108,15 @@
         class="md:hidden fixed inset-0 bg-white z-40 p-6"
     >
         <div class="flex flex-col space-y-6 text-center">
-            <a href="#home" @click="mobileMenuOpen = false" class="text-xl text-gray-600 hover:text-primary">Beranda</a>
-            <a href="#services" @click="mobileMenuOpen = false" class="text-xl text-gray-600 hover:text-primary">Layanan</a>
-            <a href="#testimonials" @click="mobileMenuOpen = false" class="text-xl text-gray-600 hover:text-primary">Testimoni</a>
+            <a href="#home" @click="mobileMenuOpen = false" class="text-xl text-gray-600">Beranda</a>
+            <a href="#services" @click="mobileMenuOpen = false" class="text-xl text-gray-600">Layanan</a>
+            <a href="#testimonials" @click="mobileMenuOpen = false" class="text-xl text-gray-600">Testimoni</a>
+
             <div class="flex flex-col space-y-4 pt-4">
-                <a href="{{ route('login') }}" class="px-6 py-3 border border-primary text-primary rounded-lg">
+                <a href="#login" class="px-6 py-3 border border-primary text-primary rounded-lg">
                     Masuk
                 </a>
-                <a href="{{ route('register') }}" class="px-6 py-3 bg-primary text-white rounded-lg">
+                <a href="#register" class="px-6 py-3 bg-primary text-white rounded-lg">
                     Daftar
                 </a>
             </div>
@@ -133,40 +127,26 @@
 <!-- Hero Section -->
 <header
     id="home"
-    class="relative min-h-screen flex items-center justify-center custom-gradient text-white"
+    class="relative min-h-screen flex items-center elegant-gradient text-white"
 >
     <div class="container mx-auto px-4 grid md:grid-cols-2 gap-12 items-center">
-        <div
-            data-aos="fade-right"
-            class="space-y-6 text-center md:text-left"
-        >
+        <div class="space-y-6 text-center md:text-left">
             <h1 class="text-5xl font-bold leading-tight">
                 Kesehatan Profesional, Seketika
             </h1>
             <p class="text-lg opacity-80">
-                Platform kesehatan digital terdepan dengan perawat profesional siap melayani kebutuhan medis Anda.
+                Platform kesehatan digital terdepan dengan perawat profesional.
             </p>
             <div class="flex justify-center md:justify-start space-x-4">
-                <a
-                    href="{{ route('login') }}"
-                    class="px-6 py-3 bg-white text-primary rounded-lg hover:bg-gray-100 transition flex items-center space-x-2"
-                >
-                    <i class="fas fa-ambulance"></i>
-                    <span>Layanan Darurat</span>
+                <a href="/login" class="px-6 py-3 bg-white text-primary rounded-lg hover:bg-gray-100">
+                    <i class="fas fa-ambulance mr-2"></i>Layanan Darurat
                 </a>
-                <a
-                    href="{{ route('login') }}"
-                    class="px-6 py-3 border border-white text-white rounded-lg hover:bg-white/20 transition flex items-center space-x-2"
-                >
-                    <i class="fas fa-calendar-alt"></i>
-                    <span>Booking Perawat</span>
+                <a href="/login" class="px-6 py-3 border border-white text-white rounded-lg hover:bg-white/20">
+                    <i class="fas fa-calendar-alt mr-2"></i>Booking Perawat
                 </a>
             </div>
         </div>
-        <div
-            data-aos="fade-left"
-            class="hidden md:block"
-        >
+        <div class="hidden md:block">
             <img
                 src="{{ asset('images/nurse.png') }}"
                 alt="Medical Illustration"
@@ -183,13 +163,12 @@
         <div class="grid md:grid-cols-3 gap-8">
             @php
                 $services = [
-                    ['icon' => 'fa-ambulance', 'title' => 'Layanan Darurat', 'description' => 'Respon cepat dalam 15 menit dengan tim medis berpengalaman.'],
-                    ['icon' => 'fa-home', 'title' => 'Home Care', 'description' => 'Perawatan komprehensif di kenyamanan rumah Anda.'],
-                    ['icon' => 'fa-user-md', 'title' => 'Perawat Profesional', 'description' => 'Tenaga medis tersertifikasi dengan pengalaman terjamin.']
+                    ['icon' => 'fa-ambulance', 'title' => 'Layanan Darurat', 'description' => 'Respon cepat dalam 15 menit.'], ['icon' => 'fa-home', 'title' => 'Home Care', 'description' => 'Perawatan komprehensif di rumah Anda.'],
+                    ['icon' => 'fa-user-md', 'title' => 'Perawat Profesional', 'description' => 'Tenaga medis tersertifikasi dan berpengalaman.']
                 ];
             @endphp
             @foreach($services as $service)
-                <div class="bg-white p-8 rounded-xl shadow-lg hover:shadow-xl transition transform hover:-translate-y-2">
+                <div class="bg-white soft-shadow rounded-xl p-8 transition-transform transform hover:scale-105">
                     <div class="text-5xl flex justify-center mb-4 text-primary">
                         <i class="fas {{ $service['icon'] }}"></i>
                     </div>
@@ -213,7 +192,7 @@
         @endphp
         <div class="grid md:grid-cols-2 gap-8">
             @foreach($testimonials as $testimonial)
-                <div class="bg-white p-8 rounded-xl shadow-md hover:shadow-xl transition">
+                <div class="bg-white p-8 rounded-xl shadow-md transition-transform transform hover:scale-105">
                     <p class="italic text-gray-600 mb-6">"{{ $testimonial['quote'] }}"</p>
                     <div class="flex items-center justify-center space-x-4">
                         <div>
@@ -238,8 +217,8 @@
         <h2 class="text-4xl font-bold mb-6">Siap Memulai Perjalanan Kesehatan Anda?</h2>
         <p class="text-xl mb-8">Dapatkan layanan perawatan profesional hanya dengan beberapa klik</p>
         <div class="flex justify-center space-x-4">
-            <a href="{{ route('register') }}" class="bg-white text-primary px-6 py-3 rounded-lg hover:bg-gray-200 transition">Daftar Sekarang</a>
-            <a href="{{ route('login') }}" class="border-2 border-white text-white px-6 py-3 rounded-lg hover:bg-gray-200 hover:text-primary transition">Masuk</a>
+            <a href="/register" class="bg-white text-primary px-6 py-3 rounded-lg hover:bg-gray-200">Daftar Sekarang</a>
+            <a href="/login" class="border-2 border-white text-white px-6 py-3 rounded-lg hover:bg-gray-200 hover:text-primary">Masuk</a>
         </div>
     </div>
 </section>
@@ -257,31 +236,12 @@
 
 <!-- Script untuk Mobile Menu -->
 <script>
-    AOS.init();
     document.addEventListener('DOMContentLoaded', function() {
-        const mobileMenuToggle = document.getElementById('mobile-menu-toggle');
-        const mobileMenuClose = document.getElementById('mobile-menu-close');
-        const mobileMenu = document.getElementById('mobile-menu');
-        const mobileMenuLinks = document.querySelectorAll('.mobile-menu-link');
+        const mobileMenuToggle = document.querySelector('button[aria-expanded]');
+        const mobileMenu = document.querySelector('.md:hidden');
 
-        // Toggle Mobile Menu
         mobileMenuToggle.addEventListener('click', function() {
-            mobileMenu.classList.toggle('translate-x-full');
-            mobileMenu.classList.toggle('translate-x-0');
-        });
-
-        // Close Mobile Menu
-        mobileMenuClose.addEventListener('click', function() {
-            mobileMenu.classList.remove('translate-x-0');
-            mobileMenu.classList.add('translate-x-full');
-        });
-
-        // Close Menu when Link is Clicked
-        mobileMenuLinks.forEach(link => {
-            link.addEventListener('click', function() {
-                mobileMenu.classList.remove('translate-x-0');
-                mobileMenu.classList.add('translate-x-full');
-            });
+            mobileMenu.classList.toggle('hidden');
         });
     });
 </script>
