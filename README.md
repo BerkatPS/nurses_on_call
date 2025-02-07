@@ -34,7 +34,6 @@
 
 **Frontend:**
 - Blade Templating
-- Livewire + Alpine.js
 - Tailwind CSS
 - Chart.js
 
